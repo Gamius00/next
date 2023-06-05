@@ -1,95 +1,38 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+"use client"
+import { FieldValues, useForm } from "react-hook-form";
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    const { register, handleSubmit, formState: { errors } } = useForm();
+    const router = useRouter();
+    const onSubmit = (data) => { 
+      fetch('/api/comparePasswords', {
+        method: 'POST',
+        body: JSON.stringify({
+          password: data.password
+        })
+      }).then((res) => {
+        if (res.ok) {
+          alert('Correct password!')
+          router.push('/login')
+        } else {
+          alert('Incorrect password!')
+        }
+      })
+    }
+  
+    return (
+      <div className="h-screen w-full flex justify-center">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col space-y-4">
+          <div className="p-2 flex flex-col space-y-2">
+            <label  class="Password-Text" htmlFor="password">Password</label>
+            <input class="Input" {...register("password", { required: true })} className="border border-gray-300 rounded-md dark:text-black" />
+          </div>
+
+          {errors.password && <span>This field is required</span>}
+
+          <input  type="submit" class="Button"/>
+        </form>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://beta.nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    )
 }
